@@ -8,7 +8,6 @@
     html, body { height: 100%; margin: 0; padding: 0; }
     body { min-height: 100vh; min-width: 100vw; height: 100vh; width: 100vw; margin: 0; padding: 0; overflow: hidden; background: #111; display: flex; align-items: center; justify-content: center; }
     img { width: 100vw; height: 100vh; object-fit: cover; display: block; border-radius: 0; background: #111; }
-    #error { position: absolute; top: 24px; left: 0; right: 0; text-align: center; color: #fff; background: #c00; padding: 8px; }
   </style>
 </head>
 <body>
@@ -21,10 +20,6 @@
     const base = `https://storage.yandexcloud.net/${BUCKET}/${encodeURIComponent(KEY)}`;
     const img = document.getElementById('hero');
     const errorDiv = document.getElementById('error');
-    
-    img.onerror = function() {
-      errorDiv.textContent = 'Ошибка загрузки изображения. Возможные причины: файл не загружен, неправильные настройки доступа к бакету, или проблемы с CORS.';
-    };
     
     img.onload = function() {
       errorDiv.textContent = '';
