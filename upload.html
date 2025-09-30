@@ -5,35 +5,182 @@
   <title>Загрузка в Yandex Object Storage</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body { font-family: system-ui; padding: 24px; max-width: 640px; margin: auto; }
-    progress { width: 100%; display: none; }
-    .row { margin: 8px 0; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #232526 0%, #414345 100%);
+      min-height: 100vh;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .form-box {
+      background: rgba(255,255,255,0.07);
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+      border-radius: 18px;
+      padding: 32px 28px 24px 28px;
+      max-width: 400px;
+      width: 100%;
+      margin: 32px 0 24px 0;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    h1 {
+      color: #fff;
+      text-align: center;
+      margin-bottom: 18px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .row {
+      margin: 18px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label, select, input[type="file"] {
+      color: #fff;
+      font-size: 1.1rem;
+    }
+    select, input[type="file"] {
+      background: rgba(255,255,255,0.13);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #fff;
+      font-size: 1.1rem;
+      margin-top: 4px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    select:focus, input[type="file"]:focus {
+      border: 1.5px solid #6ec1e4;
+    }
+    button {
+      background: linear-gradient(90deg, #6ec1e4 0%, #3a8dde 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 10px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px 0 rgba(31,38,135,0.10);
+      transition: background 0.2s, transform 0.1s;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #3a8dde 0%, #6ec1e4 100%);
+      transform: translateY(-2px) scale(1.03);
+    }
+    #status {
+      min-height: 24px;
+      color: #fff;
+      font-size: 1.08rem;
+      margin-top: 10px;
+      text-align: center;
+    }
+    #status a {
+      color: #6ec1e4;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    #status.error {
+      color: #ff4d4f;
+      font-weight: 600;
+    }
+    progress {
+      width: 100%;
+      height: 18px;
+      border-radius: 8px;
+      margin-top: 10px;
+      background: #222;
+      box-shadow: 0 1px 4px 0 rgba(31,38,135,0.10);
+      overflow: hidden;
+      display: none;
+    }
+    progress[value]::-webkit-progress-bar {
+      background-color: #222;
+      border-radius: 8px;
+    }
+    progress[value]::-webkit-progress-value {
+      background: linear-gradient(90deg, #6ec1e4 0%, #3a8dde 100%);
+      border-radius: 8px;
+      transition: width 0.2s;
+    }
+    progress[value]::-moz-progress-bar {
+      background: linear-gradient(90deg, #6ec1e4 0%, #3a8dde 100%);
+      border-radius: 8px;
+      transition: width 0.2s;
+    }
+    .links {
+      margin-top: 24px;
+      text-align: center;
+    }
+    .links a {
+      color: #fff;
+      background: #232526;
+      border-radius: 6px;
+      padding: 7px 16px;
+      margin: 0 4px;
+      text-decoration: none;
+      font-size: 1.08rem;
+      transition: background 0.18s, color 0.18s;
+      display: inline-block;
+    }
+    .links a:hover {
+      background: #6ec1e4;
+      color: #232526;
+    }
+    @media (max-width: 600px) {
+      .form-box {
+        padding: 18px 6vw 16px 6vw;
+        max-width: 98vw;
+      }
+      h1 { font-size: 1.3rem; }
+      button { font-size: 1rem; }
+      select, input[type="file"] { font-size: 1rem; }
+    }
   </style>
 </head>
 <body>
-  <h1>Загрузить фото</h1>
+  <div class="form-box">
+    <h1>Загрузить фото</h1>
 
-  <div class="row">
-    <input id="file" type="file" accept="image/*" />
+    <div class="row">
+      <input id="file" type="file" accept="image/*" />
+    </div>
+
+    <div class="row">
+      <label>Для какой страницы загрузить:
+        <select id="imgnum">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row">
+      <button id="btn">Загрузить</button>
+    </div>
+
+    <div id="status" class="row"></div>
+    <progress id="bar" value="0" max="100"></progress>
   </div>
-
-  <div class="row">
-    <label>Для какой страницы загрузить:
-      <select id="imgnum">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-    </label>
+  <div class="links">Перейти на страницу:
+    <a href="/">Экран 1</a>
+    <a href="/2.html">Экран 2</a>
+    <a href="/3.html">Экран 3</a>
+    <a href="/4.html">Экран 4</a>
   </div>
-
-  <div class="row">
-    <button id="btn">Загрузить</button>
-  </div>
-
-  <div id="status" class="row"></div>
-  <progress id="bar" value="0" max="100"></progress>
 
   <script>
     const fileEl = document.getElementById('file');
