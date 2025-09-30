@@ -30,7 +30,12 @@ export default async function handler(req, res) {
     }
 
     const safe = String(filename).replace(/[^\w.\-]/g, "_");
-    const key = mode === "single" ? "public/hero.jpg" : `gallery/${Date.now()}-${safe}`;
+    let key;
+    if (["1.jpg","2.jpg","3.jpg","4.jpg"].includes(safe)) {
+      key = `public/${safe}`;
+    } else {
+      return res.status(400).json({ error: "Можно загружать только 1.jpg, 2.jpg, 3.jpg или 4.jpg" });
+    }
 
     const cmd = new PutObjectCommand({
       Bucket: process.env.YOS_BUCKET,

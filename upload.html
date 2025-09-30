@@ -18,7 +18,14 @@
   </div>
 
   <div class="row">
-    <label><input id="overwrite" type="checkbox" checked /> Перезаписывать одну картинку (hero.jpg)</label>
+    <label>Для какой страницы загрузить:
+      <select id="imgnum">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </label>
   </div>
 
   <div class="row">
@@ -30,7 +37,7 @@
 
   <script>
     const fileEl = document.getElementById('file');
-    const overwriteEl = document.getElementById('overwrite');
+    const imgnumEl = document.getElementById('imgnum');
     const statusEl = document.getElementById('status');
     const barEl = document.getElementById('bar');
 
@@ -47,9 +54,9 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filename: file.name,
+          filename: imgnumEl.value + '.jpg',
           contentType: file.type,
-          mode: overwriteEl.checked ? 'single' : 'multi'
+          mode: 'single'
         })
       });
 
