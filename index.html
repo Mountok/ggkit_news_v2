@@ -12,11 +12,23 @@
 <body>
   <h1>Актуальное фото</h1>
   <img id="hero" alt="Фото" />
+  <div id="error" style="color: red; margin-top: 16px;"></div>
   <script>
     const BUCKET = 'ggkit-news';
     const KEY = 'public/hero.jpg';
     const base = `https://storage.yandexcloud.net/${BUCKET}/${encodeURIComponent(KEY)}`;
-    document.getElementById('hero').src = `${base}?t=${Date.now()}`;
+    const img = document.getElementById('hero');
+    const errorDiv = document.getElementById('error');
+    
+    img.onerror = function() {
+      errorDiv.textContent = 'Ошибка загрузки изображения. Возможные причины: файл не загружен, неправильные настройки доступа к бакету, или проблемы с CORS.';
+    };
+    
+    img.onload = function() {
+      errorDiv.textContent = '';
+    };
+    
+    img.src = `${base}?t=${Date.now()}`;
   </script>
 </body>
 </html>
