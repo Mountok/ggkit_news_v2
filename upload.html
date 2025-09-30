@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Загрузка в Yandex Object Storage</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: system-ui; padding: 24px; max-width: 640px; margin: auto; }
+    progress { width: 100%; display: none; }
+    .row { margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <h1>Загрузить фото</h1>
+
+  <div class="row">
+    <input id="file" type="file" accept="image/*" />
+  </div>
+
+  <div class="row">
+    <label><input id="overwrite" type="checkbox" checked /> Перезаписывать одну картинку (hero.jpg)</label>
+  </div>
+
+  <div class="row">
+    <button id="btn">Загрузить</button>
+  </div>
+
+  <div id="status" class="row"></div>
+  <progress id="bar" value="0" max="100"></progress>
+
+  <script>
+    const fileEl = document.getElementById('file');
+    const overwriteEl = document.getElementById('overwrite');
+    const statusEl = document.getElementById('status');
+    const barEl = document.getElementById('bar');
+
+    document.getElementById('btn').onclick = async () => {
+      const file = fileEl.files?.[0];
+      if (!file) return alert('Выберите файл');
+      if (!file.type.startsWith('image/')) return alert('Только изображения');
+      const MAX_MB = 5;
+      if (file.size > MAX_MB * 1024 * 1024) return alert('Максимум 5 МБ');
+
+      statusEl.textContent = 'Готовим ссылку...';
+
+      const r = await fetch('/api/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          mode: overwriteEl.checked ? 'single' : 'multi'
+        })
+      });
+
+      const data = await r.json();
+      if (!r.ok) {
+        statusEl.textContent = 'Ошибка: ' + (data.error || r.status);
+        return;
+      }
+
+      statusEl.textContent = 'Загружаем...';
+
+      // Прямая загрузка (PUT) с прогрессом
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', data.uploadUrl, true);
+      xhr.setRequestHeader('Content-Type', file.type);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          barEl.style.display = 'block';
+          barEl.value = Math.round((e.loaded / e.total) * 100);
+        }
+      };
+      xhr.onload = () => {
+        barEl.style.display = 'none';
+        if (xhr.status >= 200 && xhr.status < 300) {
+          statusEl.innerHTML = `Готово. <a href="${data.publicUrl}" target="_blank">Открыть файл</a>`;
+        } else {
+          statusEl.textContent = 'Ошибка загрузки: ' + xhr.status + ' ' + xhr.responseText;
+        }
+      };
+      xhr.onerror = () => {
+        barEl.style.display = 'none';
+        statusEl.textContent = 'Ошибка сети при загрузке';
+      };
+
+      xhr.send(file);
+    };
+  </script>
+</body>
+</html>

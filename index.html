@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Актуальное фото</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: system-ui; padding: 24px; max-width: 900px; margin: auto; }
+    img { max-width: 100%; height: auto; border-radius: 12px; }
+  </style>
+</head>
+<body>
+  <h1>Актуальное фото</h1>
+  <img id="hero" alt="Фото" />
+  <script>
+    const BUCKET = 'ggkit-news';
+    const KEY = 'public/hero.jpg';
+    const base = `https://storage.yandexcloud.net/${BUCKET}/${encodeURIComponent(KEY)}`;
+    document.getElementById('hero').src = `${base}?t=${Date.now()}`;
+  </script>
+</body>
+</html>
